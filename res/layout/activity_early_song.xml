@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <TextView
+   	    android:id="@+id/earlysongTitleBar"
+   	    android:layout_width="match_parent"
+   	    android:layout_height="60dp"
+   	    android:background="#2EB8E6"
+   	    android:layout_alignParentTop="true" />
+    
+    <TextView
+        android:id="@+id/earlysong_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/earlysongTitleBar"
+        android:layout_alignTop="@+id/earlysongTitleBar"
+        android:paddingLeft="20dp"
+        android:textColor="#FFFFFF"
+        android:textSize="45sp" />
+
+    <ListView
+        android:id="@+id/listView_early"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+         android:layout_below="@id/earlysongTitleBar"
+        android:layout_centerHorizontal="true" >
+
+    </ListView>
+
+</RelativeLayout>

@@ -17,6 +17,7 @@ import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -41,6 +42,7 @@ OnSharedPreferenceChangeListener{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_first);
 		
 		Switch mSwitch = (Switch)findViewById(R.id.switch1);

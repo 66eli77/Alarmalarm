@@ -1,12 +1,15 @@
 package com.majia.alarmalarm;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -29,6 +32,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_second);
 		
 		mySetting = new MySettings(this);
@@ -70,6 +74,10 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 		rate.setOnTouchListener(this);
 		
 		//routine for setting up UI
+		String selectedEarlySong = sharedPreferences.getString("selected_early_song", "song selection");
+		song_selection_early.setText(selectedEarlySong);
+		String selectedMustSong = sharedPreferences.getString("selected_must_song", "song selection");
+		song_selection_must.setText(selectedMustSong);
 		increas_checkBox_must.setChecked(sharedPreferences.getBoolean("increas_checkBox_must", false));
 		vib_checkBox_must.setChecked(sharedPreferences.getBoolean("vib_checkBox_must", false));
 		increas_checkBox_early.setChecked(sharedPreferences.getBoolean("increas_checkBox_early", false));
@@ -78,6 +86,16 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 				audioManager.getStreamMaxVolume(AudioManager.STREAM_RING))); // default to be max volume
 		seekBar_early.setProgress(sharedPreferences.getInt("seekBar_early", 
 				audioManager.getStreamMaxVolume(AudioManager.STREAM_RING)/2)); // default to be halt max volume
+	}
+	
+	@Override
+	protected void onResume() {
+        super.onResume();
+        String selectedEarlySong_2 = sharedPreferences.getString("selected_early_song", "song selection");
+		song_selection_early.setText(selectedEarlySong_2);
+		
+		String selectedMustSong_2 = sharedPreferences.getString("selected_must_song", "song selection");
+		song_selection_must.setText(selectedMustSong_2);
 	}
 
 	@Override
@@ -101,19 +119,24 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 		switch (event.getAction()) {				
 			case MotionEvent.ACTION_DOWN:
 				if(v.equals(song_selection_must)){
-					
+					Intent MustSongIntent = new Intent(this, MustSongActivity.class);
+					startActivity(MustSongIntent);
 					break;
 				}
 				if(v.equals(song_selection_early)){
-					
+					Intent earlySongIntent = new Intent(this, EarlySongActivity.class);
+					startActivity(earlySongIntent);
 					break;
 				}	
 				if(v.equals(about)){
-					
+					Intent aboutIntent = new Intent(this, AboutActivity.class);
+					startActivity(aboutIntent);
 					break;
 				}
 				if(v.equals(rate)){
-					
+					Intent browserIntent = new Intent(Intent.ACTION_VIEW, 
+							Uri.parse("https://play.google.com/store/apps/details?id=com.catgarden.android&hl=en"));
+					startActivity(browserIntent);
 					break;
 				}
 		}

@@ -148,16 +148,24 @@ public class MainActivity extends TabActivity {
             }
             
             if(!sharedPreferences.getBoolean("increas_checkBox_must", false)){
-            	audioManager.setStreamVolume(AudioManager.STREAM_ALARM, sharedPreferences.getInt("seekBar_must", 7), 
-            			AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+            	audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 
+            			sharedPreferences.getInt("seekBar_must", 7), 0);
             }
             if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+            	/*
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
                 mMediaPlayer.prepare();
                 mMediaPlayer.start();
+                */
+                
+                int song = sharedPreferences.getInt("selected_must_song_id", 0);
+            	mMediaPlayer = MediaPlayer.create(context.getApplicationContext(), song);
+            	mMediaPlayer.setLooping(true);
+            	mMediaPlayer.start();
+                
                 
               //stop playing after certain amount of time   
-    	 		long alarmEndTime = 1000*10;   //end after 5 seconds
+    	 		long alarmEndTime = 1000*60*3;   //end after 10 seconds
     	 		new CountDownTimer(alarmEndTime, 1000) {
     	 			int i = 0;
     	 		     public void onTick(long millisUntilFinished) {
@@ -165,8 +173,7 @@ public class MainActivity extends TabActivity {
     	 		    	 //do nothing
     	 		    	 if(sharedPreferences.getBoolean("increas_checkBox_must", false)){
     	 		    		 if(i < sharedPreferences.getInt("seekBar_must", 7)){
-    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, i++, 
-    	 		    					 AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, i++, 0);
     	 		    		 }
     	 		    	 }
     	 		     }
@@ -193,8 +200,8 @@ public class MainActivity extends TabActivity {
             }
             
             if(!sharedPreferences.getBoolean("increas_checkBox_early", false)){
-            	audioManager.setStreamVolume(AudioManager.STREAM_ALARM, sharedPreferences.getInt("seekBar_early", 4), 
-            			AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+            	audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 
+            			sharedPreferences.getInt("seekBar_early", 4), 0);
             }
             if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
@@ -202,7 +209,7 @@ public class MainActivity extends TabActivity {
                 mMediaPlayer.start();
                 
               //stop playing after certain amount of time   
-    	 		long alarmEndTime = 1000*10;   //end after 5 seconds
+    	 		long alarmEndTime = 1000*20;   //end after 10 seconds
     	 		new CountDownTimer(alarmEndTime, 1000) {
     	 			int i = 0;
     	 		     public void onTick(long millisUntilFinished) {
@@ -210,8 +217,7 @@ public class MainActivity extends TabActivity {
     	 		    	 //do nothing
     	 		    	 if(sharedPreferences.getBoolean("increas_checkBox_early", false)){
     	 		    		 if(i < sharedPreferences.getInt("seekBar_early", 4)){
-    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, i++, 
-    	 		    					 AudioManager.FLAG_SHOW_UI + AudioManager.FLAG_PLAY_SOUND);
+    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, i++, 0);
     	 		    		 }
     	 		    	 }
     	 		     }
