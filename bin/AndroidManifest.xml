@@ -44,6 +44,14 @@
             android:screenOrientation="portrait"
             android:name="com.majia.alarmalarm.MustSongActivity" >
         </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.majia.alarmalarm.LocalSongEarlyActivity" >
+        </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name="com.majia.alarmalarm.LocalSongMustActivity" >
+        </activity>
     </application>
 
 </manifest>

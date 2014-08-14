@@ -59,7 +59,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 		song_selection_must.setOnTouchListener(this);
 		seekBar_must.setOnSeekBarChangeListener(this);
 			//sets the range between 0 and the max volume  
-		seekBar_must.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
+		seekBar_must.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
 		seekBar_must.setKeyProgressIncrement(1);
 		
 		increas_checkBox_early.setOnCheckedChangeListener(this);
@@ -67,35 +67,61 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 		song_selection_early.setOnTouchListener(this);
 		seekBar_early.setOnSeekBarChangeListener(this);
 			//sets the range between 0 and the max volume  
-		seekBar_early.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_RING));
+		seekBar_early.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
 		seekBar_early.setKeyProgressIncrement(1);
 		
 		about.setOnTouchListener(this);
 		rate.setOnTouchListener(this);
 		
 		//routine for setting up UI
-		String selectedEarlySong = sharedPreferences.getString("selected_early_song", "song selection");
-		song_selection_early.setText(selectedEarlySong);
-		String selectedMustSong = sharedPreferences.getString("selected_must_song", "song selection");
-		song_selection_must.setText(selectedMustSong);
+		boolean local_early = sharedPreferences.getBoolean("local_boolean_early", false);
+    	if(local_early){
+    		String n = sharedPreferences.getString("local_name_early", "error");
+    		song_selection_early.setText(n);
+    	}else{
+    		String selectedEarlySong = sharedPreferences.getString("selected_early_song", "song selection");
+    		song_selection_early.setText(selectedEarlySong);
+    	}
+    	
+    	boolean local_must = sharedPreferences.getBoolean("local_boolean_must", false);
+    	if(local_must){
+    		String n = sharedPreferences.getString("local_name_must", "error");
+    		song_selection_must.setText(n);
+    	}else{
+    		String selectedMustSong = sharedPreferences.getString("selected_must_song", "song selection");
+    		song_selection_must.setText(selectedMustSong);
+    	}
+    	
 		increas_checkBox_must.setChecked(sharedPreferences.getBoolean("increas_checkBox_must", false));
 		vib_checkBox_must.setChecked(sharedPreferences.getBoolean("vib_checkBox_must", false));
 		increas_checkBox_early.setChecked(sharedPreferences.getBoolean("increas_checkBox_early", false));
 		vib_checkBox_early.setChecked(sharedPreferences.getBoolean("vib_checkBox_must", false));
 		seekBar_must.setProgress(sharedPreferences.getInt("seekBar_must", 
-				audioManager.getStreamMaxVolume(AudioManager.STREAM_RING))); // default to be max volume
+				audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))); // default to be max volume
 		seekBar_early.setProgress(sharedPreferences.getInt("seekBar_early", 
-				audioManager.getStreamMaxVolume(AudioManager.STREAM_RING)/2)); // default to be halt max volume
+				audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)/2)); // default to be halt max volume
 	}
 	
 	@Override
 	protected void onResume() {
         super.onResume();
-        String selectedEarlySong_2 = sharedPreferences.getString("selected_early_song", "song selection");
-		song_selection_early.setText(selectedEarlySong_2);
+        boolean local_early = sharedPreferences.getBoolean("local_boolean_early", false);
+    	if(local_early){
+    		String n2 = sharedPreferences.getString("local_name_early", "error");
+    		song_selection_early.setText(n2);
+    	}else{
+    		String selectedEarlySong_2 = sharedPreferences.getString("selected_early_song", "song selection");
+    		song_selection_early.setText(selectedEarlySong_2);
+    	}
 		
-		String selectedMustSong_2 = sharedPreferences.getString("selected_must_song", "song selection");
-		song_selection_must.setText(selectedMustSong_2);
+    	boolean local_must = sharedPreferences.getBoolean("local_boolean_must", false);
+    	if(local_must){
+    		String nn = sharedPreferences.getString("local_name_must", "error");
+    		song_selection_must.setText(nn);
+    	}else{
+    		String selectedMustSong_2 = sharedPreferences.getString("selected_must_song", "song selection");
+    		song_selection_must.setText(selectedMustSong_2);
+    	}
 	}
 
 	@Override
@@ -147,11 +173,11 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		if(seekBar.equals(seekBar_early) && fromUser){
 			mySetting.savePreferences("seekBar_early", progress);
-			Toast.makeText(this, "seekBar_early" + progress, Toast.LENGTH_SHORT).show();
+			//.makeText(this, "seekBar_early" + progress, Toast.LENGTH_SHORT).show();
 		}
 		if(seekBar.equals(seekBar_must) && fromUser){
 			mySetting.savePreferences("seekBar_must", progress);
-			Toast.makeText(this, "seekBar_must" + progress, Toast.LENGTH_SHORT).show();
+			//Toast.makeText(this, "seekBar_must" + progress, Toast.LENGTH_SHORT).show();
 		}
 	}
 

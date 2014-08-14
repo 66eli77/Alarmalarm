@@ -20,12 +20,24 @@
         android:paddingLeft="20dp"
         android:textColor="#FFFFFF"
         android:textSize="45sp" />
+    
+    <TextView
+        android:id="@+id/local_song_early"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/earlysongTitleBar"
+        android:background="#CADCE6"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        android:textSize="18sp"
+        android:text="Selecte song from your local collection" />
 
     <ListView
         android:id="@+id/listView_early"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-         android:layout_below="@id/earlysongTitleBar"
+        android:layout_below="@id/local_song_early"
         android:layout_centerHorizontal="true" >
 
     </ListView>

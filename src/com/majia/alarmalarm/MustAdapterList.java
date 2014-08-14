@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -38,6 +39,11 @@ public class MustAdapterList extends ArrayAdapter<DataList> {
     private class ViewHolderMust {
         RadioButton radioBtn;
     }
+    
+    public void uncheckSelected(){
+    	if(mCurrentlyCheckedRB != null)
+    		mCurrentlyCheckedRB.setChecked(false);
+    }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
         holder = null;
@@ -53,12 +59,18 @@ public class MustAdapterList extends ArrayAdapter<DataList> {
 
         song = rowItem.getSong();
         int selectedSong = sharedPreferences.getInt("selected_must_song_id", 0);
-        if(song == selectedSong){
-        	holder.radioBtn.setChecked(true);
+        //Toast.makeText(context, "in" , Toast.LENGTH_SHORT).show();
+        if(sharedPreferences.getBoolean("local_boolean_must", false)){
+        	holder.radioBtn.setChecked(false);
         	mCurrentlyCheckedRB = holder.radioBtn;
-		}else{
-			holder.radioBtn.setChecked(false);
-		}
+        }else{
+        	if(song == selectedSong){
+        		holder.radioBtn.setChecked(true);
+        		mCurrentlyCheckedRB = holder.radioBtn;
+        	}else{
+        		holder.radioBtn.setChecked(false);
+        	}
+        }
         
         holder.radioBtn.setOnClickListener(new OnClickListener() {
         	int mySong = song;
@@ -77,10 +89,15 @@ public class MustAdapterList extends ArrayAdapter<DataList> {
             	}
             	mediaPlayer.start();
             	mySetting.savePreferences("selected_must_song_id", mySong);
+            	mySetting.savePreferences("local_boolean_must", false);
+            	
+            	MustSongActivity.localSongMust.setBackgroundColor(Color.WHITE);
 
-                mCurrentlyCheckedRB.setChecked(false);
-                ((RadioButton) v).setChecked(true);
-                mCurrentlyCheckedRB = (RadioButton) v;
+            	if (mCurrentlyCheckedRB != null) {
+            		mCurrentlyCheckedRB.setChecked(false);
+            		((RadioButton) v).setChecked(true);
+            		mCurrentlyCheckedRB = (RadioButton) v;
+            	}
             }
         });
 

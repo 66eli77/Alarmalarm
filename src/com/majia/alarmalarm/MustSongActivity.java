@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MotionEvent;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 
 public class MustSongActivity extends Activity implements View.OnTouchListener{
 	private TextView back;
+	static TextView localSongMust;
 	private ListView listView;
 	private List<DataList> rowItems;
     DataList listData;
@@ -34,10 +37,16 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 	    mySetting = new MySettings(this);
 	    
 	    back = (TextView) findViewById(R.id.mustsong_back);
+	    localSongMust = (TextView) findViewById(R.id.local_song_must);
 	    listView = (ListView) findViewById(R.id.listView_must);
 	    back.setText("<");
 	    
+	    String n = sharedPreferences.getString("local_name_must", 
+	    		"Selecte song from your local collection");
+	    localSongMust.setText(n);
+	    
 	    back.setOnTouchListener(this);
+	    localSongMust.setOnTouchListener(this);
 	    
 	    rowItems = new ArrayList<DataList>();
 	    listData = new DataList("9000000", R.raw.i90000);
@@ -76,6 +85,20 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 	    //closing transition animations
 	    overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
 	}
+	
+	@Override
+	protected void onResume() {
+        super.onResume();
+        String n = sharedPreferences.getString("local_name_must", 
+	    		"Selecte song from your local collection");
+        localSongMust.setText(n);
+	    if(sharedPreferences.getBoolean("local_boolean_must", false)){
+	    	localSongMust.setBackgroundColor(Color.YELLOW);
+	    	adapter.uncheckSelected();
+	    }else{
+	    	localSongMust.setBackgroundColor(Color.WHITE);
+	    }
+	}
 
 
 	@Override
@@ -99,6 +122,25 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 				}
 			}
 			finish();
+		}
+		
+		if(v.equals(localSongMust)){
+			List<PlayerAndId> mediaList = adapter.getMediaList();
+			for(int i = 0; i < mediaList.size(); i++){
+        		try{
+        			if(mediaList.get(i).getPlayer().isPlaying()){
+        				mediaList.get(i).getPlayer().pause();
+        				mediaList.get(i).getPlayer().seekTo(0);
+        			}
+        		}catch(Exception ex) { 
+        			ex.printStackTrace();
+        		} 	
+        	}
+			
+			Intent localSongIntent = new Intent(this, LocalSongMustActivity.class);
+			localSongIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(localSongIntent);
+			//finish();
 		}
 		return true;
 	}

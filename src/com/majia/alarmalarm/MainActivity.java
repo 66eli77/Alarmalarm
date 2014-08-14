@@ -1,7 +1,5 @@
 package com.majia.alarmalarm;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -13,8 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -95,12 +91,12 @@ public class MainActivity extends TabActivity {
 				 		    .setIcon(android.R.drawable.ic_dialog_alert)
 				 		    .setCancelable(false)
 				 		     .show();
-				playSound_early(this, getAlarmUri());				 		   	 		  
+				playSound_early(this);				 		   	 		  
 			}
 			if(getIntent().getStringExtra("methodName_must") != null && getIntent().getStringExtra("methodName_must").equals("mustAlarmDialog")){
 				//stop early alarm first
 				mMediaPlayer.stop();
-				
+Toast.makeText(MainActivity.this, "cancel early alarm", Toast.LENGTH_SHORT).show();				
 				AlarmManager alarmMgr;			 		    
 		        alarmMgr = (AlarmManager)MainActivity.this.getSystemService(Activity.ALARM_SERVICE);
 		        PendingIntent alarmIntent;
@@ -131,15 +127,12 @@ public class MainActivity extends TabActivity {
 							.setIcon(android.R.drawable.ic_dialog_alert)
 							.setCancelable(false)
 							.show();
-				playSound_must(this, getAlarmUri_2());
+				playSound_must(this);
 			}
 		}
 	}
 
-	private void playSound_must(Context context, Uri alert) {
-        try {
-            mMediaPlayer.setDataSource(context, alert);
-           // final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+	private void playSound_must(Context context) {
             
             if(sharedPreferences.getBoolean("vib_checkBox_must", false)){
             	audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
@@ -148,24 +141,30 @@ public class MainActivity extends TabActivity {
             }
             
             if(!sharedPreferences.getBoolean("increas_checkBox_must", false)){
-            	audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 
+            	audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 
             			sharedPreferences.getInt("seekBar_must", 7), 0);
             }
-            if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
-            	/*
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                mMediaPlayer.prepare();
-                mMediaPlayer.start();
-                */
-                
-                int song = sharedPreferences.getInt("selected_must_song_id", 0);
-            	mMediaPlayer = MediaPlayer.create(context.getApplicationContext(), song);
-            	mMediaPlayer.setLooping(true);
-            	mMediaPlayer.start();
-                
-                
+            if (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) != 0) {
+            	
+            	boolean local_early = sharedPreferences.getBoolean("local_boolean_must", false);
+            	if(local_early){
+            		String filename_early = sharedPreferences.getString("local_data_must", "opps");
+            		try{
+            			mMediaPlayer.reset();
+            			mMediaPlayer.setDataSource(filename_early);
+            			mMediaPlayer.prepare();
+            			mMediaPlayer.setLooping(true);
+            			mMediaPlayer.start();
+            		} catch (Exception e) { }
+            	}else{
+            		int songMust = sharedPreferences.getInt("selected_must_song_id", R.raw.chariots_of_fire);
+                	mMediaPlayer = MediaPlayer.create(context.getApplicationContext(), songMust);
+                	mMediaPlayer.setLooping(true);
+                	mMediaPlayer.start();
+            	}
+                                             
               //stop playing after certain amount of time   
-    	 		long alarmEndTime = 1000*60*3;   //end after 10 seconds
+    	 		long alarmEndTime = 1000*60*3;   //end after 3 min
     	 		new CountDownTimer(alarmEndTime, 1000) {
     	 			int i = 0;
     	 		     public void onTick(long millisUntilFinished) {
@@ -173,7 +172,7 @@ public class MainActivity extends TabActivity {
     	 		    	 //do nothing
     	 		    	 if(sharedPreferences.getBoolean("increas_checkBox_must", false)){
     	 		    		 if(i < sharedPreferences.getInt("seekBar_must", 7)){
-    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, i++, 0);
+    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, i++, 0);
     	 		    		 }
     	 		    	 }
     	 		     }
@@ -183,16 +182,9 @@ public class MainActivity extends TabActivity {
     	 		     }
     	 		}.start();	
             }
-        } catch (IOException e) {
-            System.out.println("OOPS");
-        }
     }
 	
-	private void playSound_early(Context context, Uri alert) {
-        try {
-            mMediaPlayer.setDataSource(context, alert);
-           // final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            
+	private void playSound_early(Context context) {            
             if(sharedPreferences.getBoolean("vib_checkBox_early", false)){
             	audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
             }else{
@@ -200,16 +192,30 @@ public class MainActivity extends TabActivity {
             }
             
             if(!sharedPreferences.getBoolean("increas_checkBox_early", false)){
-            	audioManager.setStreamVolume(AudioManager.STREAM_ALARM, 
+            	audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 
             			sharedPreferences.getInt("seekBar_early", 4), 0);
             }
-            if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
-                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                mMediaPlayer.prepare();
-                mMediaPlayer.start();
-                
+            if (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) != 0) {
+            	
+            	boolean local_early = sharedPreferences.getBoolean("local_boolean_early", false);
+            	if(local_early){
+            		String filename_early = sharedPreferences.getString("local_data_early", "opps");
+            		try{
+            			mMediaPlayer.reset();
+            			mMediaPlayer.setDataSource(filename_early);
+            			mMediaPlayer.prepare();
+            			mMediaPlayer.setLooping(true);
+            			mMediaPlayer.start();
+            		} catch (Exception e) { }
+            	}else{
+            		int songEarly = sharedPreferences.getInt("selected_early_song_id", R.raw.satie_psychotropic_circle);
+            		mMediaPlayer = MediaPlayer.create(context.getApplicationContext(), songEarly);
+            		mMediaPlayer.setLooping(true);
+            		mMediaPlayer.start();
+            	}
+            	
               //stop playing after certain amount of time   
-    	 		long alarmEndTime = 1000*20;   //end after 10 seconds
+    	 		long alarmEndTime = 1000*60*1;   //end after 1 min
     	 		new CountDownTimer(alarmEndTime, 1000) {
     	 			int i = 0;
     	 		     public void onTick(long millisUntilFinished) {
@@ -217,7 +223,7 @@ public class MainActivity extends TabActivity {
     	 		    	 //do nothing
     	 		    	 if(sharedPreferences.getBoolean("increas_checkBox_early", false)){
     	 		    		 if(i < sharedPreferences.getInt("seekBar_early", 4)){
-    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_ALARM, i++, 0);
+    	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, i++, 0);
     	 		    		 }
     	 		    	 }
     	 		     }
@@ -227,39 +233,6 @@ public class MainActivity extends TabActivity {
     	 		     }
     	 		}.start();	
             }
-        } catch (IOException e) {
-            System.out.println("OOPS");
-        }
-    }
- 
-    //Get an alarm sound. Try for an alarm. If none set, try notification, 
-    //Otherwise, ringtone.
-    private Uri getAlarmUri() {
-        Uri alert = RingtoneManager
-                .getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if (alert == null) {
-            alert = RingtoneManager
-                    .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            if (alert == null) {
-                alert = RingtoneManager
-                        .getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-            }
-        }
-        return alert;
-    }
-    
-    private Uri getAlarmUri_2() {
-        Uri alert = RingtoneManager
-                .getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-        if (alert == null) {
-            alert = RingtoneManager
-                    .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            if (alert == null) {
-                alert = RingtoneManager
-                        .getDefaultUri(RingtoneManager.TYPE_ALARM);
-            }
-        }
-        return alert;
     }
 
 }

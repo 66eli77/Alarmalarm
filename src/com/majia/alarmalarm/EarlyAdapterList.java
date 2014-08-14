@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 public class EarlyAdapterList extends ArrayAdapter<DataList> {
 
@@ -38,6 +40,11 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
     private class ViewHolderEarly {
         RadioButton radioBtn;
     }
+    
+    public void uncheckSelected(){
+    	if(mCurrentlyCheckedRB != null)
+    		mCurrentlyCheckedRB.setChecked(false);
+    }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
         holder = null;
@@ -53,34 +60,42 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
 
         song = rowItem.getSong();
         int selectedSong = sharedPreferences.getInt("selected_early_song_id", 0);
-        if(song == selectedSong){
-        	holder.radioBtn.setChecked(true);
+        //Toast.makeText(context, "in" , Toast.LENGTH_SHORT).show();
+        if(sharedPreferences.getBoolean("local_boolean_early", false)){
+        	holder.radioBtn.setChecked(false);
         	mCurrentlyCheckedRB = holder.radioBtn;
-		}else{
-			holder.radioBtn.setChecked(false);
-		}
-        
+        }else{
+        	if(song == selectedSong){
+        		holder.radioBtn.setChecked(true);
+        		mCurrentlyCheckedRB = holder.radioBtn;
+        	}else{
+        		holder.radioBtn.setChecked(false);
+        	}
+        }
         holder.radioBtn.setOnClickListener(new OnClickListener() {
         	int mySong = song;
         	MediaPlayer mediaPlayer = MediaPlayer.create(context.getApplicationContext(), mySong);
         	MediaPlayerList mpl = new MediaPlayerList(mediaPlayer, mediaList, mySong);
-        	
             @Override
             public void onClick(View v) {
             	//MediaPlayer mediaPlayer;
             	for(int i = 0; i < mediaList.size(); i++){
             		if(mediaList.get(i).getPlayer().isPlaying()){
-
             			mediaList.get(i).getPlayer().pause();
             			mediaList.get(i).getPlayer().seekTo(0);
             		}
             	}
             	mediaPlayer.start();
             	mySetting.savePreferences("selected_early_song_id", mySong);
-
-                mCurrentlyCheckedRB.setChecked(false);
-                ((RadioButton) v).setChecked(true);
-                mCurrentlyCheckedRB = (RadioButton) v;
+            	mySetting.savePreferences("local_boolean_early", false);
+            	
+            	EarlySongActivity.localSongEarly.setBackgroundColor(Color.WHITE);
+            	
+            	if (mCurrentlyCheckedRB != null) {
+            		mCurrentlyCheckedRB.setChecked(false);
+            		((RadioButton) v).setChecked(true);
+            		mCurrentlyCheckedRB = (RadioButton) v;
+            	}
             }
         });
 

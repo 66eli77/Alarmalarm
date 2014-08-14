@@ -143,7 +143,7 @@ OnSharedPreferenceChangeListener{
 				TV_earliest.setText(span_E);
 				//set the alarm for early alarm
 				setEarlyAlarm();
-				Toast.makeText(this, "setEarlyAlarm", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(this, "setEarlyAlarm", Toast.LENGTH_SHORT).show();
 				mySetting.savePreferences("Switch_State", true);
 				break;
 				
@@ -165,7 +165,7 @@ OnSharedPreferenceChangeListener{
 						inputText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				TV_must.setText(span_M);
 				//set the alarm for must alarm
-				Toast.makeText(this, "setMustAlarm", Toast.LENGTH_SHORT).show();
+				//Toast.makeText(this, "setMustAlarm", Toast.LENGTH_SHORT).show();
 				setMustAlarm();
 				mySetting.savePreferences("Switch_State", true);
 				break;
@@ -217,12 +217,12 @@ OnSharedPreferenceChangeListener{
 		if(key == "nap_interval" && sharedPreferences.getBoolean("Switch_State", false)
 				&& sharedPreferences.getBoolean("Toggle_State", false)){
 			setEarlyAlarm();
-			Toast.makeText(this, "key: nap_interval", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(this, "key: nap_interval", Toast.LENGTH_SHORT).show();
 		}
 		
 		if(key == "Toggle_State" && sharedPreferences.getBoolean("Switch_State", false)){
 			setEarlyAlarm();
-			Toast.makeText(this, "key: Toggle_State", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(this, "key: Toggle_State", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
