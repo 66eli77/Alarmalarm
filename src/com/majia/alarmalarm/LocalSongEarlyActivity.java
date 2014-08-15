@@ -5,7 +5,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,9 +24,9 @@ public class LocalSongEarlyActivity extends Activity implements View.OnTouchList
 	private Cursor musiccursor;
 	private int music_column_index;
 	private int count;
-	private MediaPlayer mMediaPlayer;
     private TextView back;
     private MySettings mySetting;
+    private SingletonMediaPlayer player = SingletonMediaPlayer.getInstance();
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +56,8 @@ public class LocalSongEarlyActivity extends Activity implements View.OnTouchList
     @Override
     public boolean onTouch(View v, MotionEvent event) {
     	if(v.equals(back)){
-    		mMediaPlayer.reset();
+    		if(player.isPlaying())
+    			player.reset();
     		finish();
     	}
     	return true;
@@ -79,7 +79,6 @@ public class LocalSongEarlyActivity extends Activity implements View.OnTouchList
         musiclist.setAdapter(new MusicAdapter(getApplicationContext()));
 
         musiclist.setOnItemClickListener(musicgridlistener);
-        mMediaPlayer = new MediaPlayer();
     }
     
     private OnItemClickListener musicgridlistener = new OnItemClickListener() {
@@ -89,20 +88,12 @@ public class LocalSongEarlyActivity extends Activity implements View.OnTouchList
               musiccursor.moveToPosition(position);
               String filename = musiccursor.getString(music_column_index);
 
-              try {
-                    if (mMediaPlayer.isPlaying()) {
-                          mMediaPlayer.reset();
-                    }
-                    TextView s = (TextView) v;
-                    String a = s.getText().toString();
-                    mySetting.savePreferences("local_name_early", a);
-                    mySetting.savePreferences("local_data_early", filename);
-                    mySetting.savePreferences("local_boolean_early", true);
-                   // Toast.makeText(LocalSongActivity.this, "name " + a, Toast.LENGTH_SHORT).show();
-                    mMediaPlayer.setDataSource(filename);
-                    mMediaPlayer.prepare();
-                    mMediaPlayer.start();
-              } catch (Exception e) { }
+              TextView s = (TextView) v;
+              String a = s.getText().toString();
+              mySetting.savePreferences("local_name_early", a);
+              mySetting.savePreferences("local_data_early", filename);
+              mySetting.savePreferences("local_boolean_early", true);
+              player.play_setDataSource(filename);
         }
   };
   

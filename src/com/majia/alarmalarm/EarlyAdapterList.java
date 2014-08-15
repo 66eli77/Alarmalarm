@@ -1,12 +1,10 @@
 package com.majia.alarmalarm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.media.MediaPlayer;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,9 +20,9 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
     ViewHolderEarly holder;
     private RadioButton mCurrentlyCheckedRB;
     private int song;
-    private List<PlayerAndId> mediaList = new ArrayList<PlayerAndId>();
     private MySettings mySetting;
     SharedPreferences sharedPreferences;
+    private SingletonMediaPlayer player = SingletonMediaPlayer.getInstance();
     
     public EarlyAdapterList(Context context, int textViewResourceId, List<DataList> items) {
         super(context, textViewResourceId, items);
@@ -33,10 +31,6 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
     
-    public List<PlayerAndId> getMediaList(){
-    	return mediaList;
-    }
-
     private class ViewHolderEarly {
         RadioButton radioBtn;
     }
@@ -74,18 +68,10 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
         }
         holder.radioBtn.setOnClickListener(new OnClickListener() {
         	int mySong = song;
-        	MediaPlayer mediaPlayer = MediaPlayer.create(context.getApplicationContext(), mySong);
-        	MediaPlayerList mpl = new MediaPlayerList(mediaPlayer, mediaList, mySong);
             @Override
             public void onClick(View v) {
-            	//MediaPlayer mediaPlayer;
-            	for(int i = 0; i < mediaList.size(); i++){
-            		if(mediaList.get(i).getPlayer().isPlaying()){
-            			mediaList.get(i).getPlayer().pause();
-            			mediaList.get(i).getPlayer().seekTo(0);
-            		}
-            	}
-            	mediaPlayer.start();
+            	player.stop();
+            	player.play_inAdapterList(context, mySong);
             	mySetting.savePreferences("selected_early_song_id", mySong);
             	mySetting.savePreferences("local_boolean_early", false);
             	

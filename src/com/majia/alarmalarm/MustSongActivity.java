@@ -24,6 +24,7 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
     MustAdapterList adapter;
     SharedPreferences sharedPreferences;
     private MySettings mySetting;
+    private SingletonMediaPlayer player = SingletonMediaPlayer.getInstance();
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -104,15 +105,7 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if(v.equals(back)){
-			List<PlayerAndId> mediaList = adapter.getMediaList();
-			for(int i = 0; i < mediaList.size(); i++){
-        		try{
-        			mediaList.get(i).getPlayer().stop();
-        			mediaList.get(i).getPlayer().release();
-        		}catch(Exception ex) { 
-        			ex.printStackTrace();
-        		} 	
-        	}
+			player.stop();
 			
 			int selectedSong = sharedPreferences.getInt("selected_must_song_id", 0);
 			for(int j = 0; j < rowItems.size(); j++){
@@ -125,22 +118,11 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 		}
 		
 		if(v.equals(localSongMust)){
-			List<PlayerAndId> mediaList = adapter.getMediaList();
-			for(int i = 0; i < mediaList.size(); i++){
-        		try{
-        			if(mediaList.get(i).getPlayer().isPlaying()){
-        				mediaList.get(i).getPlayer().pause();
-        				mediaList.get(i).getPlayer().seekTo(0);
-        			}
-        		}catch(Exception ex) { 
-        			ex.printStackTrace();
-        		} 	
-        	}
+			player.stop();
 			
 			Intent localSongIntent = new Intent(this, LocalSongMustActivity.class);
 			localSongIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(localSongIntent);
-			//finish();
 		}
 		return true;
 	}

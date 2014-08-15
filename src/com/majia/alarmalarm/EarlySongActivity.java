@@ -24,11 +24,8 @@ public class EarlySongActivity extends Activity implements View.OnTouchListener{
 	private EarlyAdapterList adapter;
 	private SharedPreferences sharedPreferences;
     private MySettings mySetting;
-   /* 
-    public TextView l(){
-    	return localSong;
-    }
-    */
+    private SingletonMediaPlayer player = SingletonMediaPlayer.getInstance();
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -120,15 +117,8 @@ public class EarlySongActivity extends Activity implements View.OnTouchListener{
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if(v.equals(back)){
-			List<PlayerAndId> mediaList = adapter.getMediaList();
-			for(int i = 0; i < mediaList.size(); i++){
-        		try{
-        			mediaList.get(i).getPlayer().stop();
-        			mediaList.get(i).getPlayer().release();
-        		}catch(Exception ex) { 
-        			ex.printStackTrace();
-        		} 	
-        	}
+			if(player.isPlaying())
+				player.stop();
 			
 			int selectedSong = sharedPreferences.getInt("selected_early_song_id", 0);
 			for(int j = 0; j < rowItems.size(); j++){
@@ -141,22 +131,11 @@ public class EarlySongActivity extends Activity implements View.OnTouchListener{
 		}
 		
 		if(v.equals(localSongEarly)){
-			List<PlayerAndId> mediaList = adapter.getMediaList();
-			for(int i = 0; i < mediaList.size(); i++){
-        		try{
-        			if(mediaList.get(i).getPlayer().isPlaying()){
-        				mediaList.get(i).getPlayer().pause();
-        				mediaList.get(i).getPlayer().seekTo(0);
-        			}
-        		}catch(Exception ex) { 
-        			ex.printStackTrace();
-        		} 	
-        	}
-			
+			if(player.isPlaying())
+				player.stop();
 			Intent localSongIntent = new Intent(this, LocalSongEarlyActivity.class);
 			localSongIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(localSongIntent);
-			//finish();
 		}
 		return true;
 	}
