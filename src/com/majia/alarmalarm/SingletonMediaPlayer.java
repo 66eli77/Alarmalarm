@@ -1,16 +1,20 @@
 package com.majia.alarmalarm;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
+import android.os.Vibrator;
 
 public class SingletonMediaPlayer {
 	private MediaPlayer mMediaPlayer;
 	private AudioManager audioManager;
 	private SharedPreferences sharedPreferences;
+	private CountDownTimer ct;
 	
 	private static SingletonMediaPlayer instance = new SingletonMediaPlayer();
 	
@@ -22,12 +26,35 @@ public class SingletonMediaPlayer {
 		return instance;
 	}
 	
-	public boolean isPlaying(){
-		if(mMediaPlayer.isPlaying()){
-			return true;
-		}else{
+	public boolean notNull(){
+		if(mMediaPlayer == null){
 			return false;
+		}else{
+			return true;
 		}
+	}
+	
+	public void cancelCountDownTimer(){
+		if(ct != null){
+			ct.cancel();
+		}
+	}
+		
+	public void release(){
+		mMediaPlayer.reset();
+		mMediaPlayer.release();
+		mMediaPlayer = null;
+	}
+	
+	public boolean isPlaying(){
+		if(mMediaPlayer != null){
+			if(mMediaPlayer.isPlaying()){
+				return true;
+			}else{
+				return false;
+			}
+		}
+		return false; 
 	}
 	
 	public void reset(){
@@ -39,6 +66,9 @@ public class SingletonMediaPlayer {
 	}
 	
 	public void play_setDataSource(String filename){
+		if(mMediaPlayer == null){
+			mMediaPlayer = new MediaPlayer();
+		}
 		try{
 			mMediaPlayer.reset();
 			mMediaPlayer.setDataSource(filename);
@@ -52,19 +82,25 @@ public class SingletonMediaPlayer {
 		mMediaPlayer.start();
 	}
 	
-	public void playSound_early(Context context) {      
+	public void playSound_early(Context context, AlertDialog alertDialog_early, Vibrator vibrator) {     
+		final Vibrator v = vibrator;
+		mMediaPlayer = new MediaPlayer();
 		audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean vib;
 		
 		if(sharedPreferences.getBoolean("vib_checkBox_early", false)){
-        	audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+			vib = true;
         }else{
-        	audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        	vib = false;
         }
-        
+		//add this to avoid jerky sound at the beginning
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 1, 0);
+		
         if(!sharedPreferences.getBoolean("increas_checkBox_early", false)){
         	audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 
-        			sharedPreferences.getInt("seekBar_early", 4), 0);
+        			sharedPreferences.getInt("seekBar_early", 
+        					audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)), 0);
         }
         if (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) != 0) {
         	
@@ -77,49 +113,67 @@ public class SingletonMediaPlayer {
         			mMediaPlayer.prepare();
         			mMediaPlayer.setLooping(true);
         			mMediaPlayer.start();
+        			if(vib)
+        				v.vibrate(1000*60*1);
         		} catch (Exception e) { }
         	}else{
-        		int songEarly = sharedPreferences.getInt("selected_early_song_id", R.raw.satie_psychotropic_circle);
+        		int songEarly = sharedPreferences.getInt("selected_early_song_id", R.raw.beautiful_dance_keys);
         		mMediaPlayer = MediaPlayer.create(context.getApplicationContext(), songEarly);
         		mMediaPlayer.setLooping(true);
         		mMediaPlayer.start();
-        	}
-        	
-          //stop playing after certain amount of time   
-	 		long alarmEndTime = 1000*60*1;   //end after 1 min
-	 		new CountDownTimer(alarmEndTime, 1000) {
-	 			int i = 0;
-	 		     public void onTick(long millisUntilFinished) {
-	 		    	 // do something on interval
-	 		    	 //do nothing
-	 		    	 if(sharedPreferences.getBoolean("increas_checkBox_early", false)){
-	 		    		 if(i < sharedPreferences.getInt("seekBar_early", 4)){
-	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, i++, 0);
-	 		    		 }
-	 		    	 }
-	 		     }
+        		if(vib)
+        			v.vibrate(1000*60*1);
 
-	 		     public void onFinish() {
-	 		    	mMediaPlayer.stop();
-	 		     }
-	 		}.start();	
+        		final AlertDialog a = alertDialog_early;
+        		//stop playing after certain amount of time   
+        		long alarmEndTime = 1000*59*1;   //end after 1 min
+        		ct = new CountDownTimer(alarmEndTime, 1000) {
+        			int i = 0;
+        			public void onTick(long millisUntilFinished) {
+        				// do something on interval
+        				//do nothing
+        				if(sharedPreferences.getBoolean("increas_checkBox_early", false)){
+        					if(i < sharedPreferences.getInt("seekBar_early", 
+        							audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))){
+        						audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, i++, 0);
+        					}
+        				}
+        			}
+
+        			public void onFinish() {
+        				if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
+        					mMediaPlayer.stop();
+        					mMediaPlayer.reset();
+        					mMediaPlayer.release();
+        					mMediaPlayer = null;
+        					v.cancel();
+        					a.dismiss();
+        				}
+        			}
+        		}.start();	
+        	}
         }
-		
 	}
 	
-	public void playSound_must(Context context){
+	public void playSound_must(Context context, AlertDialog alertDialog_must, Vibrator vibrator){
+		final Vibrator v = vibrator;
+		mMediaPlayer = new MediaPlayer();
 		audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		boolean vib;
 		
 		if(sharedPreferences.getBoolean("vib_checkBox_must", false)){
-        	audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+			vib = true;
         }else{
-        	audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+        	vib = false;
         }
+		//add this to avoid jerky sound at the beginning
+		audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 1, 0);
         
         if(!sharedPreferences.getBoolean("increas_checkBox_must", false)){
         	audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 
-        			sharedPreferences.getInt("seekBar_must", 7), 0);
+        			sharedPreferences.getInt("seekBar_must", 
+        					audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)), 0);
         }
         if (audioManager.getStreamVolume(AudioManager.STREAM_MUSIC) != 0) {
         	
@@ -132,30 +186,42 @@ public class SingletonMediaPlayer {
         			mMediaPlayer.prepare();
         			mMediaPlayer.setLooping(true);
         			mMediaPlayer.start();
+        			if(vib)
+        				v.vibrate(1000*60*3);
         		} catch (Exception e) { }
         	}else{
         		int songMust = sharedPreferences.getInt("selected_must_song_id", R.raw.chariots_of_fire);
             	mMediaPlayer = MediaPlayer.create(context.getApplicationContext(), songMust);
             	mMediaPlayer.setLooping(true);
             	mMediaPlayer.start();
+            	if(vib)
+    				v.vibrate(1000*60*3);
         	}
-                                         
+        	final AlertDialog b = alertDialog_must;    
           //stop playing after certain amount of time   
 	 		long alarmEndTime = 1000*60*3;   //end after 3 min
-	 		new CountDownTimer(alarmEndTime, 1000) {
+	 		ct = new CountDownTimer(alarmEndTime, 1000) {
 	 			int i = 0;
 	 		     public void onTick(long millisUntilFinished) {
 	 		    	 // do something on interval
 	 		    	 //do nothing
 	 		    	 if(sharedPreferences.getBoolean("increas_checkBox_must", false)){
-	 		    		 if(i < sharedPreferences.getInt("seekBar_must", 7)){
+	 		    		 if(i < sharedPreferences.getInt("seekBar_must", 
+	 		    				 audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))){
 	 		    			 audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, i++, 0);
 	 		    		 }
 	 		    	 }
 	 		     }
 
 	 		     public void onFinish() {
-	 		    	mMediaPlayer.stop();
+	 		    	 if(mMediaPlayer != null && mMediaPlayer.isPlaying()){
+	 		    		 mMediaPlayer.stop();
+	 		    		 mMediaPlayer.reset();
+	 		    		 mMediaPlayer.release();
+	 		    		 mMediaPlayer = null;
+	 		    		 v.cancel();
+	 		    		 b.dismiss();
+	 		    	 }
 	 		     }
 	 		}.start();	
         }

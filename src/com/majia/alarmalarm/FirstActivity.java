@@ -4,10 +4,13 @@ import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
@@ -15,10 +18,12 @@ import android.support.v4.app.FragmentManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +33,8 @@ implements CompoundButton.OnCheckedChangeListener, View.OnTouchListener, EditDia
 OnSharedPreferenceChangeListener{
 	private TextView TV_earliest;
 	private TextView TV_interval;
+	private ImageView interval_frame_selected;
+	private ImageView interval_frame_unselected;
 	private TextView TV_must;
 	private Switch switch1;
 	private HourMinuteTimePicker hourMinutePicker_earliest;
@@ -39,24 +46,27 @@ OnSharedPreferenceChangeListener{
 	private PendingIntent alarmIntent_must;
 	private SharedPreferences sharedPreferences;
 	
+	private NotificationManager notificationManager;
+	private Notification notification;
+	private static final int NOTIFICATION_EX = 1;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_first);
 		
-		Switch mSwitch = (Switch)findViewById(R.id.switch1);
-		if(mSwitch != null){
-			mSwitch.setOnCheckedChangeListener(this);
-		}
-		
 		switch1 = (Switch) findViewById(R.id.switch1);
+		switch1.setOnCheckedChangeListener(this);
+		
 		TV_earliest = (TextView) findViewById(R.id.textView_earliest);
 		TV_interval = (TextView) findViewById(R.id.textView_interval);
 		TV_must = (TextView) findViewById(R.id.textView_must);
 		TV_earliest.setOnTouchListener(this);
 		TV_interval.setOnTouchListener(this);
 		TV_must.setOnTouchListener(this);
+		interval_frame_selected = (ImageView) findViewById(R.id.interval_frame_selected);
+		interval_frame_unselected = (ImageView) findViewById(R.id.interval_frame_unselected);
 		
 		mySetting = new MySettings(this);
 		//routine for loading the settings
@@ -67,19 +77,9 @@ OnSharedPreferenceChangeListener{
 		hourMinutePicker_must = new HourMinuteTimePicker();
 		
 		boolean switch_state = sharedPreferences.getBoolean("Switch_State", false);
-/*		 
-		//routine for setting up switch and alarm
-		if(switch_state){			
-			//set the alarm
-			setAlarm()
-		}else{
-			// If the alarm has been set, cancel it.   Don's know if this works???
-			cancelAlarm();
-		}
-*/
 		switch1.setChecked(switch_state);
 		
-		String Earliest_Alarm = sharedPreferences.getString("Earliest_Alarm", "0:00");
+		String Earliest_Alarm = sharedPreferences.getString("Earliest_Alarm", "7:00 AM");
 		//make "am/pm" half as smaller
 		Spannable span_E = new SpannableString(Earliest_Alarm);
 		span_E.setSpan(new RelativeSizeSpan(0.5f), Earliest_Alarm.length()-3, 
@@ -89,85 +89,105 @@ OnSharedPreferenceChangeListener{
 		boolean toggle_state = sharedPreferences.getBoolean("Toggle_State", false);
 		if(toggle_state){
 			String nap_interval = sharedPreferences.getString("nap_interval", "0");
+			TV_interval.setTextColor(Color.parseColor("#FFFFFF"));
 			TV_interval.setText("Nap Interval : " + nap_interval + " min");
+			interval_frame_selected.setVisibility(View.VISIBLE);
+			interval_frame_unselected.setVisibility(View.INVISIBLE);
 		}else{
-			TV_interval.setText("nap interval disabled");
+		//	TV_interval.setTextColor(Color.parseColor("#A0A0A0"));
+			TV_interval.setText("");
+		//	TV_interval.setVisibility(View.INVISIBLE);
+			interval_frame_selected.setVisibility(View.INVISIBLE);
+			interval_frame_unselected.setVisibility(View.VISIBLE);
 		}
-		String Must_Wakeup_Alarm = sharedPreferences.getString("Must_Wakeup_Alarm", "0:00");
+		String Must_Wakeup_Alarm = sharedPreferences.getString("Must_Wakeup_Alarm", "7:30 AM");
 		Spannable span_M = new SpannableString(Must_Wakeup_Alarm);
 		span_M.setSpan(new RelativeSizeSpan(0.5f), Must_Wakeup_Alarm.length()-3, 
 				Must_Wakeup_Alarm.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		TV_must.setText(span_M);	
+		
 	}
 	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
-		
-		case MotionEvent.ACTION_MOVE:	//get touch x y coordinates
-			//x = (int) event.getX();
-			//y = (int) event.getY();
 			
 		case MotionEvent.ACTION_DOWN:
 			if(v.equals(TV_earliest)){
-				//Toast.makeText(this, "tv1", Toast.LENGTH_SHORT).show();
-				hourMinutePicker_earliest.show(getFragmentManager(), "timePicker");
 				switchState = 1;
+				hourMinutePicker_earliest.show(getFragmentManager(), "timePicker_early");
 				break;
 			}
 			if(v.equals(TV_interval)){
+				switchState = 2;
 				myNumPicker = new NumPicker();
 				FragmentManager fm = getSupportFragmentManager();
 				myNumPicker.show(fm, "numberPicker");
-				switchState = 2;
 				break;
 			}
 			if(v.equals(TV_must)){
-				hourMinutePicker_must.show(getFragmentManager(), "timePicker");
 				switchState = 3;
+				hourMinutePicker_must.show(getFragmentManager(), "timePicker_must");
 				break;
 			}
 		}
 		return true;
 	}
 
-	int switchState = 3;
+	int switchState = 4;
 	@Override
 	public void onFinishEditDialog(String inputText) {
 		switch(switchState){
 		case 1:	mySetting.savePreferences("Earliest_Alarm", inputText);
+		
+				//save the time settings
+				mySetting.savePreferences("early_hour", hourMinutePicker_earliest.hour);
+				mySetting.savePreferences("early_min", hourMinutePicker_earliest.minutes);
+		
 				//make "am/pm" half as smaller
 				Spannable span_E = new SpannableString(inputText);
 				span_E.setSpan(new RelativeSizeSpan(0.5f), inputText.length()-3, 
 						inputText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				TV_earliest.setText(span_E);
 				//set the alarm for early alarm
-				setEarlyAlarm();
-				//Toast.makeText(this, "setEarlyAlarm", Toast.LENGTH_SHORT).show();
-				mySetting.savePreferences("Switch_State", true);
+		//		setEarlyAlarm();
+		//		mySetting.savePreferences("Switch_State", true);
+				
+		//		switch1.setChecked(true);
 				break;
 				
 		case 2: mySetting.savePreferences("nap_interval", inputText);
-		
-				//setEarlyAlarm();
-				
+						
 				boolean toggle_state = sharedPreferences.getBoolean("Toggle_State", false);
 				if(toggle_state){
+					TV_interval.setTextColor(Color.parseColor("#FFFFFF"));
 					TV_interval.setText("nap interval : " + inputText + " min");
+					interval_frame_selected.setVisibility(View.VISIBLE);
+					interval_frame_unselected.setVisibility(View.INVISIBLE);
 				}else{
-					TV_interval.setText("nap interval disabled");
+				//	TV_interval.setTextColor(Color.parseColor("#FF0000"));
+					TV_interval.setText("");
+				//	TV_interval.setVisibility(View.INVISIBLE);
+					interval_frame_selected.setVisibility(View.INVISIBLE);
+					interval_frame_unselected.setVisibility(View.VISIBLE);
 				}
 				break;
 				
 		case 3: mySetting.savePreferences("Must_Wakeup_Alarm", inputText);
+		
+				//save the time settings
+				mySetting.savePreferences("must_hour", hourMinutePicker_must.hour);
+				mySetting.savePreferences("must_min", hourMinutePicker_must.minutes);
+				
 				Spannable span_M = new SpannableString(inputText);
 				span_M.setSpan(new RelativeSizeSpan(0.5f), inputText.length()-3, 
 						inputText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				TV_must.setText(span_M);
 				//set the alarm for must alarm
-				//Toast.makeText(this, "setMustAlarm", Toast.LENGTH_SHORT).show();
-				setMustAlarm();
-				mySetting.savePreferences("Switch_State", true);
+			//	setMustAlarm();
+			//	mySetting.savePreferences("Switch_State", true);
+				
+			//	switch1.setChecked(true);
 				break;
 		}		
 	}
@@ -177,12 +197,26 @@ OnSharedPreferenceChangeListener{
         super.onResume();
 	}
 	
+	boolean tracker = true;
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		if(isChecked){
+			CharSequence contentTitle = "Alarmalarm";
+		    CharSequence contentText = "is set";
+			
+			notification = new Notification.Builder(this)
+			.setContentTitle(contentTitle)
+			.setContentText(contentText)
+			.setSmallIcon(R.drawable.alarmalarm_icon)
+			.build();
+			
+			notificationManager = (NotificationManager)getSystemService(this.NOTIFICATION_SERVICE);	
+			notificationManager.notify(NOTIFICATION_EX, notification);
+			
 			mySetting.savePreferences("Switch_State", true);
-		}else{
-			mySetting.savePreferences("Switch_State", false);
+		}else{		
+			notificationManager.cancel(NOTIFICATION_EX); 
+    		mySetting.savePreferences("Switch_State", false);	
 		}
 	}
 
@@ -198,11 +232,8 @@ OnSharedPreferenceChangeListener{
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		
-        //Toast.makeText(this, "share listener", Toast.LENGTH_SHORT).show();
-        
+	        
 		if(key == "Switch_State"){
-        	//Toast.makeText(this, "key: Switch_State", Toast.LENGTH_SHORT).show();
         	boolean switch_state = sharedPreferences.getBoolean("Switch_State", false);
         	switch1.setChecked(switch_state);
         	if(switch_state){
@@ -213,31 +244,44 @@ OnSharedPreferenceChangeListener{
         		cancelMustAlarm();
         	}
         }
+	
+		if(key == "early_hour" || key == "early_min"){
+			if(sharedPreferences.getBoolean("Switch_State", false)){
+				setEarlyAlarm();
+			}
+		}
+		
+		if(key == "must_hour" || key == "must_min"){
+			if(sharedPreferences.getBoolean("Switch_State", false)){
+				setMustAlarm();
+			}
+		}
 		
 		if(key == "nap_interval" && sharedPreferences.getBoolean("Switch_State", false)
 				&& sharedPreferences.getBoolean("Toggle_State", false)){
 			setEarlyAlarm();
-			//Toast.makeText(this, "key: nap_interval", Toast.LENGTH_SHORT).show();
 		}
 		
 		if(key == "Toggle_State" && sharedPreferences.getBoolean("Switch_State", false)){
 			setEarlyAlarm();
-			//Toast.makeText(this, "key: Toggle_State", Toast.LENGTH_SHORT).show();
 		}
 	}
 	
 	private void setEarlyAlarm(){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		calendar.set(Calendar.HOUR_OF_DAY, hourMinutePicker_earliest.hour);
-		calendar.set(Calendar.MINUTE, hourMinutePicker_earliest.minutes);
+		int e_h = sharedPreferences.getInt("early_hour", 7);
+		calendar.set(Calendar.HOUR_OF_DAY, e_h);
+		int e_m = sharedPreferences.getInt("early_min", 0);
+		calendar.set(Calendar.MINUTE, e_m);
+//		calendar.set(Calendar.SECOND, hourMinutePicker_earliest.seconds);
 		if(calendar.getTimeInMillis() < System.currentTimeMillis()){
 			calendar.add(Calendar.DAY_OF_MONTH, 1);
 		}
-		Intent intent = new Intent(this, MainActivity.class);   //define alarm callback which activity
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("methodName_early","earlyAlarmDialog");
-		alarmIntent_early = PendingIntent.getActivity(this, 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		Intent intent1 = new Intent(this, MainActivity.class);   //define alarm callback which activity
+		intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent1.putExtra("methodName_early","earlyAlarmDialog");
+		alarmIntent_early = PendingIntent.getActivity(this, 12345, intent1, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmMgr = (AlarmManager)this.getSystemService(Activity.ALARM_SERVICE);
 
 		boolean toggle_state = sharedPreferences.getBoolean("Toggle_State", false);
@@ -251,10 +295,10 @@ OnSharedPreferenceChangeListener{
 	}
 	
 	private void cancelEarlyAlarm(){
-		Intent intent = new Intent(this, MainActivity.class);   //define alarm callback which activity
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("methodName_early","earlyAlarmDialog");
-		alarmIntent_early = PendingIntent.getActivity(this, 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		Intent intent2 = new Intent(this, MainActivity.class);   //define alarm callback which activity
+		intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent2.putExtra("methodName_early","earlyAlarmDialog");
+		alarmIntent_early = PendingIntent.getActivity(this, 12345, intent2, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmMgr = (AlarmManager)this.getSystemService(Activity.ALARM_SERVICE);
 		alarmMgr.cancel(alarmIntent_early);
 	}
@@ -262,25 +306,28 @@ OnSharedPreferenceChangeListener{
 	private void setMustAlarm(){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
-		calendar.set(Calendar.HOUR_OF_DAY, hourMinutePicker_must.hour);
-		calendar.set(Calendar.MINUTE, hourMinutePicker_must.minutes);
+		int m_h = sharedPreferences.getInt("must_hour", 7);
+		calendar.set(Calendar.HOUR_OF_DAY, m_h);
+		int m_m = sharedPreferences.getInt("must_min", 30);
+		calendar.set(Calendar.MINUTE, m_m);
+//		calendar.set(Calendar.SECOND, hourMinutePicker_must.seconds);
 		if(calendar.getTimeInMillis() < System.currentTimeMillis()){
 			calendar.add(Calendar.DAY_OF_MONTH, 1);
 		}
-		Intent intent = new Intent(this, MainActivity.class);   //define alarm callback which activity
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("methodName_must","mustAlarmDialog");
-		alarmIntent_must = PendingIntent.getActivity(this, 23456, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		Intent intent3 = new Intent(this, MainActivity.class);   //define alarm callback which activity
+		intent3.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent3.putExtra("methodName_must","mustAlarmDialog");
+		alarmIntent_must = PendingIntent.getActivity(this, 23456, intent3, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmMgr = (AlarmManager)this.getSystemService(Activity.ALARM_SERVICE);
 
 		alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent_must);
 	}
 	
 	private void cancelMustAlarm(){
-		Intent intent = new Intent(this, MainActivity.class);   //define alarm callback which activity
-		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.putExtra("methodName_must","mustAlarmDialog");
-		alarmIntent_must = PendingIntent.getActivity(this, 23456, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+		Intent intent4 = new Intent(this, MainActivity.class);   //define alarm callback which activity
+		intent4.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent4.putExtra("methodName_must","mustAlarmDialog");
+		alarmIntent_must = PendingIntent.getActivity(this, 23456, intent4, PendingIntent.FLAG_CANCEL_CURRENT);
 		alarmMgr = (AlarmManager)this.getSystemService(Activity.ALARM_SERVICE);
 		alarmMgr.cancel(alarmIntent_must);
 	}

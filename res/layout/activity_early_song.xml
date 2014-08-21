@@ -31,7 +31,7 @@
         android:paddingTop="20dp"
         android:paddingBottom="10dp"
         android:textSize="18sp"
-        android:text="Selecte song from your local collection" />
+        android:text="Select song from your local collection" />
 
     <ListView
         android:id="@+id/listView_early"

@@ -19,7 +19,7 @@ public class NumPicker extends DialogFragment implements NumberPicker.OnValueCha
 	Context context;
 	int value = 1;
 	ToggleButton earliestToggleButton;
-	private MySettings mySetting;
+	private MySettings mySetting; 
 	private boolean toggle_state;
 	
 	@Override

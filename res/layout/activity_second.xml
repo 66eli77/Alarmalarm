@@ -6,8 +6,6 @@
     tools:context="com.example.sleepmonitor.SecondActivity"
     tools:ignore="MergeRootFrame" >
     
-    
-    
     <TextView
    	    android:id="@+id/titleBar"
    	    android:layout_width="match_parent"
@@ -21,202 +19,228 @@
    	    android:paddingBottom="10dp"
    	    android:paddingLeft="20dp"
    	    android:text="Settings" />
-
-    <ImageView
-        android:id="@+id/about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/title_must"
-        android:layout_toLeftOf="@+id/anchor_setting"
-        android:layout_marginRight="1dp"
-        android:layout_marginBottom="-30dp"
-        android:src="@drawable/about" />
     
-    <ImageView
-        android:id="@+id/rate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/title_must"
-        android:layout_toRightOf="@+id/anchor_setting"
-        android:layout_marginLeft="1dp"
-        android:layout_marginBottom="-30dp"
-        android:src="@drawable/rate" />
-    
-    <TextView
+     <TextView
    	    android:id="@+id/underline"
    	    android:layout_width="match_parent"
    	    android:layout_height="1dp"
    	    android:layout_alignParentBottom="true"
    	    android:layout_marginBottom="60dp"
    	    android:background="#2EB8E6" />
-    
-    
-    <TextView
-        android:id="@+id/vibration_must"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/increasing_ringtone_must"
-        android:background="#CADCE6"
-        android:layout_marginTop="5dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="8dp"
-   	    android:paddingBottom="5dp"
-        android:textSize="18sp"
-        android:text="vibration" />
-    
-    <CheckBox
-        android:id="@+id/vib_checkBox_must"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/vibration_must"
-        android:layout_alignTop="@+id/vibration_must"
-        android:layout_alignBottom="@+id/vibration_must"
-        android:layout_alignParentRight="true"
-        android:text="    " />
-    
-    <TextView
-        android:id="@+id/increasing_ringtone_must"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/seekBar_must"
-        android:background="#CADCE6"
-        android:layout_marginTop="5dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="8dp"
-   	    android:paddingBottom="5dp"
-        android:textSize="18sp"
-        android:text="increasing ringtone" />
-    
-    <CheckBox
-        android:id="@+id/increas_checkBox_must"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/increasing_ringtone_must"
-        android:layout_alignTop="@+id/increasing_ringtone_must"
-        android:layout_alignBottom="@+id/increasing_ringtone_must"
-        android:layout_alignParentRight="true"
-        android:text="    " />
-    
-    <SeekBar
-        android:id="@+id/seekBar_must"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/song_selection_must"
-        android:background="#CADCE6"
-        android:layout_marginTop="5dp"
-        android:paddingRight="30dp"
-        android:paddingLeft="30dp"/>
-    
-    <TextView
-        android:id="@+id/song_selection_must"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_must"
-        android:background="#CADCE6"
-        android:layout_marginTop="5dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="8dp"
-   	    android:paddingBottom="5dp"
-        android:textSize="18sp" />
-    
-    <TextView
-        android:id="@+id/title_must"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/anchor_setting"
-        android:layout_marginTop="31dp"
-        android:paddingLeft="20dp"
-        android:textSize="20sp"
-        android:textColor="#A0A0A0"
-        android:text="must wakeup" />
-    
-    <View
-        android:id="@+id/anchor_setting"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true" />
-    
-    <!--android:layout_above="@+id/button1"
-        android:layout_alignLeft="@+id/button1"
-        android:layout_marginBottom="64dp"  -->
 
-    <TextView
-        android:id="@+id/vibration_early"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/anchor_setting"
-        android:background="#CADCE6"
-        android:layout_marginBottom="30dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="8dp"
-   	    android:paddingBottom="5dp"
-        android:textSize="18sp"
-        android:text="vibration" />
+    <ScrollView
+         android:id="@+id/ScrollView01"
+         android:layout_below="@+id/titleBar"
+         android:layout_above="@+id/underline"
+   		 android:layout_width="match_parent"
+   		 android:layout_height="match_parent" >
+        
+		<RelativeLayout
+			android:id="@+id/nexted_relativelayout"
+    		android:layout_width="match_parent"
+    		android:layout_height="match_parent" >
+
+   			 <ImageView
+     			android:id="@+id/about"
+      			android:layout_width="wrap_content"
+     			android:layout_height="wrap_content"
+		        android:layout_below="@+id/vibration_early"
+		        android:layout_toLeftOf="@+id/anchor_setting"
+		        android:layout_marginRight="1dp"
+		        android:layout_marginTop="-38dp"
+		        android:paddingLeft="30dp"
+		        android:src="@drawable/about" />
     
-    <CheckBox
-        android:id="@+id/vib_checkBox_early"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/vibration_early"
-        android:layout_alignTop="@+id/vibration_early"
-        android:layout_alignBottom="@+id/vibration_early"
-        android:layout_alignParentRight="true"
-        android:text="    " />
-    
-    <TextView
-        android:id="@+id/increasing_ringtone_early"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/vibration_early"
-        android:background="#CADCE6"
-        android:layout_marginBottom="5dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="8dp"
-   	    android:paddingBottom="5dp"
-        android:textSize="18sp"
-        android:text="increasing ringtone" />
-    
-    <CheckBox
-        android:id="@+id/increas_checkBox_early"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/increasing_ringtone_early"
-        android:layout_alignTop="@+id/increasing_ringtone_early"
-        android:layout_alignBottom="@+id/increasing_ringtone_early"
-        android:layout_alignParentRight="true"
-        android:text="    " />
-    
-    <SeekBar
-        android:id="@+id/seekBar_early"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/increasing_ringtone_early"
-        android:background="#CADCE6"
-        android:layout_marginBottom="5dp"
-        android:paddingRight="30dp"
-        android:paddingLeft="30dp"/>
-    
-    <TextView
-        android:id="@+id/song_selection_early"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/seekBar_early"
-        android:background="#CADCE6"
-        android:layout_marginBottom="5dp"
-        android:paddingLeft="20dp"
-        android:paddingTop="8dp"
-   	    android:paddingBottom="5dp"
-        android:textSize="18sp" />
-    
-    <TextView
-        android:id="@+id/title_early"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/song_selection_early"
-        android:layout_marginBottom="5dp"
-        android:paddingLeft="20dp"
-        android:textSize="20sp"
-        android:textColor="#A0A0A0"
-        android:text="early wakeup" />
+		    <ImageView
+		        android:id="@+id/rate"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/vibration_early"
+		        android:layout_toRightOf="@+id/anchor_setting"
+		        android:layout_marginLeft="1dp"
+		        android:layout_marginTop="-38dp"
+		        android:paddingRight="30dp"
+		        android:src="@drawable/rate" />
+		    
+		    <TextView
+		        android:id="@+id/vibration_must"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/increasing_ringtone_must"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingLeft="20dp"
+		        android:paddingTop="8dp"
+		   	    android:paddingBottom="5dp"
+		        android:textSize="18sp"
+		        android:textColor="#2EB8E6"
+		        android:text="vibration" />
+		    
+		    <CheckBox
+		        android:id="@+id/vib_checkBox_must"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_toLeftOf="@+id/vibration_must"
+		        android:layout_alignTop="@+id/vibration_must"
+		        android:layout_alignBottom="@+id/vibration_must"
+		        android:layout_alignParentRight="true"
+		        android:text="    " />
+		    
+		    <TextView
+		        android:id="@+id/increasing_ringtone_must"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/seekBar_must"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingLeft="20dp"
+		        android:paddingTop="8dp"
+		   	    android:paddingBottom="5dp"
+		        android:textSize="18sp"
+		        android:textColor="#2EB8E6"
+		        android:text="ascending ringtone" />
+		    
+		    <CheckBox
+		        android:id="@+id/increas_checkBox_must"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_toLeftOf="@+id/increasing_ringtone_must"
+		        android:layout_alignTop="@+id/increasing_ringtone_must"
+		        android:layout_alignBottom="@+id/increasing_ringtone_must"
+		        android:layout_alignParentRight="true"
+		        android:text="    " />
+		    
+		    <SeekBar
+		        android:id="@+id/seekBar_must"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/song_selection_must"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingRight="30dp"
+		        android:paddingTop="8dp"
+		        android:paddingBottom="8dp"
+		        android:paddingLeft="30dp"/>
+		    
+		    <TextView
+		        android:id="@+id/song_selection_must"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/title_must"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingLeft="20dp"
+		        android:paddingTop="8dp"
+		   	    android:paddingBottom="5dp"
+		        android:textSize="18sp" />
+		    
+		    <TextView
+		        android:id="@+id/title_must"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/about"
+		        android:layout_marginTop="-40dp"
+		        android:paddingLeft="20dp"
+		        android:background="#D1D1D1"
+		        android:textSize="12sp"
+		        android:textColor="#FFFFFF"
+		        android:text="must wakeup" />
+		    
+		    <View
+		        android:id="@+id/anchor_setting"
+		        android:layout_width="0dp"
+		        android:layout_height="0dp"
+		        android:layout_centerInParent="true" />
+		    
+		    <!--android:layout_above="@+id/button1"
+		        android:layout_alignLeft="@+id/button1"
+		        android:layout_marginBottom="64dp"  -->
+		
+		    <TextView
+		        android:id="@+id/vibration_early"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/increasing_ringtone_early"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingLeft="20dp"
+		        android:paddingTop="8dp"
+		   	    android:paddingBottom="5dp"
+		        android:textSize="18sp"
+		        android:textColor="#2EB8E6"
+		        android:text="vibration" />
+		    
+		    <CheckBox
+		        android:id="@+id/vib_checkBox_early"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_toLeftOf="@+id/vibration_early"
+		        android:layout_alignTop="@+id/vibration_early"
+		        android:layout_alignBottom="@+id/vibration_early"
+		        android:layout_alignParentRight="true"
+		        android:text="    " />
+		    
+		    <TextView
+		        android:id="@+id/increasing_ringtone_early"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/seekBar_early"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingLeft="20dp"
+		        android:paddingTop="8dp"
+		   	    android:paddingBottom="5dp"
+		        android:textSize="18sp"
+		        android:textColor="#2EB8E6"
+		        android:text="ascending ringtone" />
+		    
+		    <CheckBox
+		        android:id="@+id/increas_checkBox_early"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_toLeftOf="@+id/increasing_ringtone_early"
+		        android:layout_alignTop="@+id/increasing_ringtone_early"
+		        android:layout_alignBottom="@+id/increasing_ringtone_early"
+		        android:layout_alignParentRight="true"
+		        android:text="    " />
+		    
+		    <SeekBar
+		        android:id="@+id/seekBar_early"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/song_selection_early"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingRight="30dp"
+		        android:paddingTop="8dp"
+		        android:paddingBottom="8dp"
+		        android:paddingLeft="30dp"/>
+		    
+		    <TextView
+		        android:id="@+id/song_selection_early"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@+id/title_early"
+		        android:background="#f3f3f3"
+		        android:layout_marginTop="1dp"
+		        android:paddingLeft="20dp"
+		        android:paddingTop="8dp"
+		   	    android:paddingBottom="5dp"
+		        android:textSize="18sp" />
+		    
+		    <TextView
+		        android:id="@+id/title_early"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentTop="true"
+		        android:paddingLeft="20dp"
+		        android:background="#D1D1D1"
+		        android:textSize="12sp"
+		        android:textColor="#FFFFFF"
+		        android:text="early wakeup" />
+
+		</RelativeLayout>
+		
+    </ScrollView>
     
 </RelativeLayout>

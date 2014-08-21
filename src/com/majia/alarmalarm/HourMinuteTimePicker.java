@@ -4,7 +4,9 @@ import java.util.Calendar;
 
 import android.app.*;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.TimePicker;
 
 public class HourMinuteTimePicker extends DialogFragment
@@ -13,16 +15,30 @@ implements TimePickerDialog.OnTimeSetListener {
 	public int hour = 0;
 	public int minutes = 0;
 	private boolean flag;
+	private SharedPreferences sharedPreferences;
 	
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		// Use the current time as the default values for the picker
 		final Calendar c = Calendar.getInstance();
-		int hour = c.get(Calendar.HOUR_OF_DAY);
-		int minute = c.get(Calendar.MINUTE);
+		int hour1 = c.get(Calendar.HOUR_OF_DAY);
+		int minute1 = c.get(Calendar.MINUTE);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		int early_hour = sharedPreferences.getInt("early_hour", hour1);
+		int early_min = sharedPreferences.getInt("early_min", minute1);
+		int must_hour = sharedPreferences.getInt("must_hour", hour1);
+		int must_min = sharedPreferences.getInt("must_min", minute1);
+		String myTage = getTag();
+		if(myTage == "timePicker_early"){
+			hour1 = early_hour;
+			minute1 = early_min;
+		}else if(myTage == "timePicker_must"){
+			hour1 = must_hour;
+			minute1 = must_min;
+		}
 
 		// Create a new instance of TimePickerDialog and return it
-		TimePickerDialog tpd = new TimePickerDialog(getActivity(), this, hour, minute,false);
+		TimePickerDialog tpd = new TimePickerDialog(getActivity(), this, hour1, minute1,false);
 		tpd.setTitle("set time");
 		tpd.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int which)

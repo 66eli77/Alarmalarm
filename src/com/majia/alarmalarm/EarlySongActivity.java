@@ -43,7 +43,7 @@ public class EarlySongActivity extends Activity implements View.OnTouchListener{
 	    back.setText("<");
 	    
 	    String n = sharedPreferences.getString("local_name_early", 
-	    		"Selecte song from your local collection");
+	    		"Select song from your local collection");
 	    localSongEarly.setText(n);
 	    
 	    back.setOnTouchListener(this);
@@ -103,13 +103,13 @@ public class EarlySongActivity extends Activity implements View.OnTouchListener{
 	protected void onResume() {
         super.onResume();
         String n = sharedPreferences.getString("local_name_early", 
-	    		"Selecte song from your local collection");
+	    		"Select song from your local collection");
         localSongEarly.setText(n);
 	    if(sharedPreferences.getBoolean("local_boolean_early", false)){
-	    	localSongEarly.setBackgroundColor(Color.YELLOW);
+	    	localSongEarly.setBackgroundColor(Color.parseColor("#FBAF5D"));
 	    	adapter.uncheckSelected();
 	    }else{
-	    	localSongEarly.setBackgroundColor(Color.WHITE);
+	    	localSongEarly.setBackgroundColor(Color.parseColor("#D1D1D1"));
 	    }
 	}
 

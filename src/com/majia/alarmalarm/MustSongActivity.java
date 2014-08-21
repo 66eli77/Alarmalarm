@@ -43,7 +43,7 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 	    back.setText("<");
 	    
 	    String n = sharedPreferences.getString("local_name_must", 
-	    		"Selecte song from your local collection");
+	    		"Select song from your local collection");
 	    localSongMust.setText(n);
 	    
 	    back.setOnTouchListener(this);
@@ -91,13 +91,13 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 	protected void onResume() {
         super.onResume();
         String n = sharedPreferences.getString("local_name_must", 
-	    		"Selecte song from your local collection");
+	    		"Select song from your local collection");
         localSongMust.setText(n);
 	    if(sharedPreferences.getBoolean("local_boolean_must", false)){
-	    	localSongMust.setBackgroundColor(Color.YELLOW);
+	    	localSongMust.setBackgroundColor(Color.parseColor("#FBAF5D"));
 	    	adapter.uncheckSelected();
 	    }else{
-	    	localSongMust.setBackgroundColor(Color.WHITE);
+	    	localSongMust.setBackgroundColor(Color.parseColor("#D1D1D1"));
 	    }
 	}
 
@@ -105,7 +105,8 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if(v.equals(back)){
-			player.stop();
+			if(player.isPlaying())
+				player.stop();
 			
 			int selectedSong = sharedPreferences.getInt("selected_must_song_id", 0);
 			for(int j = 0; j < rowItems.size(); j++){
@@ -118,7 +119,8 @@ public class MustSongActivity extends Activity implements View.OnTouchListener{
 		}
 		
 		if(v.equals(localSongMust)){
-			player.stop();
+			if(player.isPlaying())
+				player.stop();
 			
 			Intent localSongIntent = new Intent(this, LocalSongMustActivity.class);
 			localSongIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

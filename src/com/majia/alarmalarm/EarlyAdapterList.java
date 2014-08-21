@@ -53,7 +53,8 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
             holder = (ViewHolderEarly) convertView.getTag();
 
         song = rowItem.getSong();
-        int selectedSong = sharedPreferences.getInt("selected_early_song_id", 0);
+        int selectedSong = sharedPreferences.getInt("selected_early_song_id", 
+        		R.raw.beautiful_dance_keys);
         //Toast.makeText(context, "in" , Toast.LENGTH_SHORT).show();
         if(sharedPreferences.getBoolean("local_boolean_early", false)){
         	holder.radioBtn.setChecked(false);
@@ -70,12 +71,13 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
         	int mySong = song;
             @Override
             public void onClick(View v) {
-            	player.stop();
+            	if(player.isPlaying())
+            		player.stop();
             	player.play_inAdapterList(context, mySong);
             	mySetting.savePreferences("selected_early_song_id", mySong);
             	mySetting.savePreferences("local_boolean_early", false);
             	
-            	EarlySongActivity.localSongEarly.setBackgroundColor(Color.WHITE);
+            	EarlySongActivity.localSongEarly.setBackgroundColor(Color.parseColor("#D1D1D1"));
             	
             	if (mCurrentlyCheckedRB != null) {
             		mCurrentlyCheckedRB.setChecked(false);

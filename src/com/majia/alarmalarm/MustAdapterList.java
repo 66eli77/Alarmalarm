@@ -52,7 +52,8 @@ public class MustAdapterList extends ArrayAdapter<DataList> {
             holder = (ViewHolderMust) convertView.getTag();
 
         song = rowItem.getSong();
-        int selectedSong = sharedPreferences.getInt("selected_must_song_id", 0);
+        int selectedSong = sharedPreferences.getInt("selected_must_song_id", 
+        		R.raw.chariots_of_fire);
         //Toast.makeText(context, "in" , Toast.LENGTH_SHORT).show();
         if(sharedPreferences.getBoolean("local_boolean_must", false)){
         	holder.radioBtn.setChecked(false);
@@ -71,12 +72,13 @@ public class MustAdapterList extends ArrayAdapter<DataList> {
         	
             @Override
             public void onClick(View v) {
-            	player.stop();
+            	if(player.isPlaying())
+            		player.stop();
             	player.play_inAdapterList(context, mySong);
             	mySetting.savePreferences("selected_must_song_id", mySong);
             	mySetting.savePreferences("local_boolean_must", false);
             	
-            	MustSongActivity.localSongMust.setBackgroundColor(Color.WHITE);
+            	MustSongActivity.localSongMust.setBackgroundColor(Color.parseColor("#D1D1D1"));
 
             	if (mCurrentlyCheckedRB != null) {
             		mCurrentlyCheckedRB.setChecked(false);

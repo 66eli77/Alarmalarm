@@ -22,7 +22,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 	
 	private CheckBox increas_checkBox_must, vib_checkBox_must, increas_checkBox_early, vib_checkBox_early;
 	private SeekBar seekBar_must, seekBar_early;
-	private TextView song_selection_must, song_selection_early;	
+	private TextView song_selection_must, song_selection_early, vib, mw;	
 	private ImageView about, rate;
 	
 	private MySettings mySetting;
@@ -53,6 +53,11 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 		about = (ImageView) findViewById(R.id.about);
 		rate = (ImageView) findViewById(R.id.rate);
 		
+		vib = (TextView) findViewById(R.id.vibration_early);
+		vib.setOnTouchListener(this);
+		mw = (TextView) findViewById(R.id.title_must);
+		mw.setOnTouchListener(this);
+		
 		//set listeners for UI elements
 		increas_checkBox_must.setOnCheckedChangeListener(this);
 		vib_checkBox_must.setOnCheckedChangeListener(this);
@@ -63,7 +68,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 		seekBar_must.setKeyProgressIncrement(1);
 		
 		increas_checkBox_early.setOnCheckedChangeListener(this);
-		increas_checkBox_early.setOnCheckedChangeListener(this);
+		vib_checkBox_early.setOnCheckedChangeListener(this);
 		song_selection_early.setOnTouchListener(this);
 		seekBar_early.setOnSeekBarChangeListener(this);
 			//sets the range between 0 and the max volume  
@@ -79,7 +84,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
     		String n = sharedPreferences.getString("local_name_early", "error");
     		song_selection_early.setText(n);
     	}else{
-    		String selectedEarlySong = sharedPreferences.getString("selected_early_song", "song selection");
+    		String selectedEarlySong = sharedPreferences.getString("selected_early_song", "sound selection");
     		song_selection_early.setText(selectedEarlySong);
     	}
     	
@@ -88,18 +93,18 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
     		String n = sharedPreferences.getString("local_name_must", "error");
     		song_selection_must.setText(n);
     	}else{
-    		String selectedMustSong = sharedPreferences.getString("selected_must_song", "song selection");
+    		String selectedMustSong = sharedPreferences.getString("selected_must_song", "sound selection");
     		song_selection_must.setText(selectedMustSong);
     	}
     	
 		increas_checkBox_must.setChecked(sharedPreferences.getBoolean("increas_checkBox_must", false));
 		vib_checkBox_must.setChecked(sharedPreferences.getBoolean("vib_checkBox_must", false));
 		increas_checkBox_early.setChecked(sharedPreferences.getBoolean("increas_checkBox_early", false));
-		vib_checkBox_early.setChecked(sharedPreferences.getBoolean("vib_checkBox_must", false));
+		vib_checkBox_early.setChecked(sharedPreferences.getBoolean("vib_checkBox_early", false));
 		seekBar_must.setProgress(sharedPreferences.getInt("seekBar_must", 
 				audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))); // default to be max volume
 		seekBar_early.setProgress(sharedPreferences.getInt("seekBar_early", 
-				audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)/2)); // default to be halt max volume
+				audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC))); // default to be max volume
 	}
 	
 	@Override
@@ -110,7 +115,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
     		String n2 = sharedPreferences.getString("local_name_early", "error");
     		song_selection_early.setText(n2);
     	}else{
-    		String selectedEarlySong_2 = sharedPreferences.getString("selected_early_song", "song selection");
+    		String selectedEarlySong_2 = sharedPreferences.getString("selected_early_song", "sound selection");
     		song_selection_early.setText(selectedEarlySong_2);
     	}
 		
@@ -119,7 +124,7 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
     		String nn = sharedPreferences.getString("local_name_must", "error");
     		song_selection_must.setText(nn);
     	}else{
-    		String selectedMustSong_2 = sharedPreferences.getString("selected_must_song", "song selection");
+    		String selectedMustSong_2 = sharedPreferences.getString("selected_must_song", "sound selection");
     		song_selection_must.setText(selectedMustSong_2);
     	}
 	}
@@ -142,29 +147,29 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		switch (event.getAction()) {				
-			case MotionEvent.ACTION_DOWN:
-				if(v.equals(song_selection_must)){
-					Intent MustSongIntent = new Intent(this, MustSongActivity.class);
-					startActivity(MustSongIntent);
-					break;
-				}
-				if(v.equals(song_selection_early)){
-					Intent earlySongIntent = new Intent(this, EarlySongActivity.class);
-					startActivity(earlySongIntent);
-					break;
-				}	
-				if(v.equals(about)){
-					Intent aboutIntent = new Intent(this, AboutActivity.class);
-					startActivity(aboutIntent);
-					break;
-				}
-				if(v.equals(rate)){
-					Intent browserIntent = new Intent(Intent.ACTION_VIEW, 
-							Uri.parse("https://play.google.com/store/apps/details?id=com.catgarden.android&hl=en"));
-					startActivity(browserIntent);
-					break;
-				}
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_UP:
+			if(v.equals(about)){
+				Intent aboutIntent = new Intent(this, AboutActivity.class);
+				startActivity(aboutIntent);
+				break;
+			}
+			if(v.equals(rate)){
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, 
+						Uri.parse("https://play.google.com/store/apps/details?id=com.catgarden.android&hl=en"));
+				startActivity(browserIntent);
+				break;
+			}
+			if(v.equals(song_selection_must)){
+				Intent MustSongIntent = new Intent(this, MustSongActivity.class);
+				startActivity(MustSongIntent);
+				break;
+			}
+			if(v.equals(song_selection_early)){
+				Intent earlySongIntent = new Intent(this, EarlySongActivity.class);
+				startActivity(earlySongIntent);
+				break;
+			}					
 		}
 		return true;
 	}
@@ -173,7 +178,6 @@ public class SecondActivity extends Activity implements CompoundButton.OnChecked
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		if(seekBar.equals(seekBar_early) && fromUser){
 			mySetting.savePreferences("seekBar_early", progress);
-			//.makeText(this, "seekBar_early" + progress, Toast.LENGTH_SHORT).show();
 		}
 		if(seekBar.equals(seekBar_must) && fromUser){
 			mySetting.savePreferences("seekBar_must", progress);
