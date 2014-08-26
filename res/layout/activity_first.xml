@@ -23,6 +23,15 @@
         android:layout_alignTop="@+id/textView_interval"
         android:layout_alignBottom="@+id/textView_interval" />
     
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/textView_interval"
+        android:layout_marginBottom="-45dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" />
+<!--  
       <ImageView
         android:id="@+id/background"
         android:layout_width="match_parent"
@@ -32,7 +41,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:src="@drawable/foggy_glass" />
-    
+-->
     <TextView
    	    android:id="@+id/titleBar"
    	    android:layout_width="match_parent"

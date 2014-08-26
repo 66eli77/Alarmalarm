@@ -37,14 +37,70 @@ public class MainActivity extends TabActivity {
 	private AlertDialog alertDialog_early;
 	private AlertDialog alertDialog_must;
 	
-	private Vibrator vib;
-	
+	@Override 
+    protected void onNewIntent(Intent intent) 
+    { 
+		//onCreate(this);
+		
+		player = SingletonMediaPlayer.getInstance();
+		//Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();		
+		/*
+		 * unlock the screen when wakeup alarm raises	
+		*/
+		pm = (PowerManager) getSystemService(this.POWER_SERVICE);  
+        km = (KeyguardManager) getSystemService(this.KEYGUARD_SERVICE);  
+        kl = km.newKeyguardLock("INFO");  
+        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK  
+               | PowerManager.ACQUIRE_CAUSES_WAKEUP  
+                | PowerManager.ON_AFTER_RELEASE, "INFO"); 
+        long t = 1000*59;
+        wl.acquire(t); // wake up the screen  
+        kl.disableKeyguard();// dismiss the keyguard
+        
+		this.getWindow().setFlags(
+	               // WindowManager.LayoutParams.FLAG_FULLSCREEN  
+	                         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD  
+	                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED  
+	                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,  
+	            //  WindowManager.LayoutParams.FLAG_FULLSCREEN  
+	                         WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD  
+	                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED  
+	                        | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON  
+	                        | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        super.onNewIntent(intent);
+  //      Toast.makeText(this, "onNewIntent", Toast.LENGTH_SHORT).show();
+        displayDialog(intent);
+    }
+   
 	@Override
 	protected void onResume() {
 		super.onResume();
 		if(wl.isHeld())
 			wl.release(); 
-		kl.reenableKeyguard();
+		kl.reenableKeyguard();		
+	}
+	
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+/*		
+		if(alertDialog_early != null && alertDialog_early.isShowing())
+			alertDialog_early.dismiss();
+		if(alertDialog_must != null && alertDialog_must.isShowing())
+			alertDialog_must.dismiss();
+		
+		if(player.notNull() && player.isPlaying()){
+     		player.stop();
+     		player.release();
+     		player.cancelVibrate();
+     	}
+		Toast.makeText(this, "in cancel all", Toast.LENGTH_SHORT).show();
+*/
+	}
+
+	@Override
+	public void onStop(){
+		super.onStop();
 	}
 	
 	@Override
@@ -58,13 +114,12 @@ public class MainActivity extends TabActivity {
 	
 	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {	    
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+//		Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();
 		player = SingletonMediaPlayer.getInstance();
-		vib = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
-		
+		//Toast.makeText(this, "onCreate", Toast.LENGTH_SHORT).show();		
 		/*
 		 * unlock the screen when wakeup alarm raises	
 		*/
@@ -88,8 +143,7 @@ public class MainActivity extends TabActivity {
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED  
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON  
                         | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);  
-        
-		 
+         
 		setContentView(R.layout.activity_main);
 		myTabHost = (TabHost)findViewById(android.R.id.tabhost);
 		//myTabHost.getTabWidget().setDividerDrawable(R.drawable.divider); // delete divider by using transparent png 
@@ -104,12 +158,21 @@ public class MainActivity extends TabActivity {
 		spec2.setContent(new Intent(this, SecondActivity.class));
 		myTabHost.addTab(spec2);
 		
-		int flags = getIntent().getFlags();  
+		displayDialog(getIntent());
+	}
+	
+	private void displayDialog(Intent theIntent){
+		Intent myIntent = theIntent;
 		mySetting = new MySettings(this);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        
-		if(getIntent() != null && getIntent().getExtras() != null && (flags & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0 ){
-			if(getIntent().getStringExtra("methodName_early") != null && getIntent().getStringExtra("methodName_early").equals("earlyAlarmDialog")){
+		int flags = myIntent.getFlags();  
+		if(myIntent != null && myIntent.getExtras() != null && (flags & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) == 0 ){
+			if(myIntent.getStringExtra("methodName_early") != null && myIntent
+					.getStringExtra("methodName_early").equals("earlyAlarmDialog")){
+				
+				//play the sound first, then display the dialog
+				player.playSound_early(this);
+				
 				alertDialog_early = new AlertDialog.Builder(this)
 					.setTitle("Wake Up")
 						.setMessage("'done' will cancel the early alarm")
@@ -118,26 +181,28 @@ public class MainActivity extends TabActivity {
 				 		        	if(player.notNull() && player.isPlaying()){
 				 		        		player.stop();
 				 		        		player.release();
-				 		        		vib.cancel();
+				 		        		player.cancelVibrate();
 				 		        	}
 				 		        	
 				 		        	//cancel early alarm
 				 		        	AlarmManager alarmMgr;			 		    
 				 		        	alarmMgr = (AlarmManager)MainActivity.this.getSystemService(Activity.ALARM_SERVICE);
 				 		        	PendingIntent alarmIntent;
-				 		        	Intent intent = new Intent(MainActivity.this, MainActivity.class);   //define alarm callback which activity
+				 		        	Intent intent = new Intent(MainActivity.this, MainActivity.class);
 				 					intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				 					intent.putExtra("methodName_early","earlyAlarmDialog");
-				 					alarmIntent = PendingIntent.getActivity(MainActivity.this, 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+				 					alarmIntent = PendingIntent.getActivity(MainActivity.this
+				 							, 12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 				 					alarmMgr.cancel(alarmIntent);
 				 					//mySetting.savePreferences("Switch_State", false);
 				 					
 				 					//cancel must alarm
 									PendingIntent alarmIntent_must;
-									Intent intent_must = new Intent(MainActivity.this, MainActivity.class);   //define alarm callback which activity
+									Intent intent_must = new Intent(MainActivity.this, MainActivity.class);
 									intent_must.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 									intent_must.putExtra("methodName_must","mustAlarmDialog");
-									alarmIntent_must = PendingIntent.getActivity(MainActivity.this, 23456, intent_must, PendingIntent.FLAG_CANCEL_CURRENT);
+									alarmIntent_must = PendingIntent.getActivity(MainActivity.this
+											, 23456, intent_must, PendingIntent.FLAG_CANCEL_CURRENT);
 									alarmMgr.cancel(alarmIntent_must);
 									
 									mySetting.savePreferences("Switch_State", false);
@@ -148,7 +213,7 @@ public class MainActivity extends TabActivity {
 				 		        	if(player.notNull() && player.isPlaying()){
 				 		        		player.stop();
 				 		        		player.release();
-				 		        		vib.cancel();
+				 		        		player.cancelVibrate();
 				 		        		if(!sharedPreferences.getBoolean("Toggle_State", false))
 				 		        			mySetting.savePreferences("Switch_State", false);
 				 		        	}
@@ -157,19 +222,24 @@ public class MainActivity extends TabActivity {
 				 		    .setIcon(android.R.drawable.ic_dialog_alert)
 				 		    .setCancelable(false)
 				 		    .show();
-				//Toast.makeText(this, "eli in", Toast.LENGTH_SHORT).show();
-				player.playSound_early(this, alertDialog_early, vib);				 		   	 		  
+				player.alertDialog_early(alertDialog_early);
 			}
-			if(getIntent().getStringExtra("methodName_must") != null && getIntent().getStringExtra("methodName_must").equals("mustAlarmDialog")){
+			
+			if(myIntent.getStringExtra("methodName_must") != null && myIntent
+					.getStringExtra("methodName_must").equals("mustAlarmDialog")){
+				
 				//stop early alarm first
 				if(player.notNull() && player.isPlaying()){
 					player.stop();
 					player.release();
 					player.cancelCountDownTimer();
-					vib.cancel();
+					player.cancelVibrate();
 				}
 				if(alertDialog_early != null && alertDialog_early.isShowing())
 					alertDialog_early.dismiss();
+				
+				//play the sound for must alarm, then display the dialog
+				player.playSound_must(this);
 					
 				AlarmManager alarmMgr;			 		    
 		        alarmMgr = (AlarmManager)MainActivity.this.getSystemService(Activity.ALARM_SERVICE);
@@ -188,16 +258,17 @@ public class MainActivity extends TabActivity {
 									if(player.notNull() && player.isPlaying()){
 										player.stop();
 										player.release();
-										vib.cancel();
+										player.cancelVibrate();
 									}
 										
 									AlarmManager alarmMgr;			 		    
 									alarmMgr = (AlarmManager)MainActivity.this.getSystemService(Activity.ALARM_SERVICE);
 									PendingIntent alarmIntent;
-									Intent intent = new Intent(MainActivity.this, MainActivity.class);   //define alarm callback which activity
+									Intent intent = new Intent(MainActivity.this, MainActivity.class);
 									intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 									intent.putExtra("methodName_must","mustAlarmDialog");
-									alarmIntent = PendingIntent.getActivity(MainActivity.this, 23456, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+									alarmIntent = PendingIntent.getActivity(MainActivity.this
+											, 23456, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 									alarmMgr.cancel(alarmIntent);
 									mySetting.savePreferences("Switch_State", false);
 								}
@@ -206,7 +277,7 @@ public class MainActivity extends TabActivity {
 							.setCancelable(false)
 							.show();
 				
-				player.playSound_must(this, alertDialog_must, vib);
+				player.alertDialog_must(alertDialog_must);
 			}
 		}
 	}

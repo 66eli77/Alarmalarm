@@ -15,6 +15,9 @@ public class SingletonMediaPlayer {
 	private AudioManager audioManager;
 	private SharedPreferences sharedPreferences;
 	private CountDownTimer ct;
+	private AlertDialog a;
+	private AlertDialog b;
+	private Vibrator v;
 	
 	private static SingletonMediaPlayer instance = new SingletonMediaPlayer();
 	
@@ -32,6 +35,11 @@ public class SingletonMediaPlayer {
 		}else{
 			return true;
 		}
+	}
+	
+	public void cancelVibrate(){
+		if(v != null)
+			v.cancel();
 	}
 	
 	public void cancelCountDownTimer(){
@@ -82,8 +90,12 @@ public class SingletonMediaPlayer {
 		mMediaPlayer.start();
 	}
 	
-	public void playSound_early(Context context, AlertDialog alertDialog_early, Vibrator vibrator) {     
-		final Vibrator v = vibrator;
+	public void alertDialog_early(AlertDialog alertDialog_early){
+		a = alertDialog_early;
+	}
+	
+	public void playSound_early(Context context) {     
+		v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 		mMediaPlayer = new MediaPlayer();
 		audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -124,7 +136,7 @@ public class SingletonMediaPlayer {
         		if(vib)
         			v.vibrate(1000*60*1);
 
-        		final AlertDialog a = alertDialog_early;
+        		//final AlertDialog a = alertDialog_early;
         		//stop playing after certain amount of time   
         		long alarmEndTime = 1000*59*1;   //end after 1 min
         		ct = new CountDownTimer(alarmEndTime, 1000) {
@@ -147,7 +159,8 @@ public class SingletonMediaPlayer {
         					mMediaPlayer.release();
         					mMediaPlayer = null;
         					v.cancel();
-        					a.dismiss();
+        					if(a != null)
+        						a.dismiss();
         				}
         			}
         		}.start();	
@@ -155,8 +168,12 @@ public class SingletonMediaPlayer {
         }
 	}
 	
-	public void playSound_must(Context context, AlertDialog alertDialog_must, Vibrator vibrator){
-		final Vibrator v = vibrator;
+	public void alertDialog_must(AlertDialog alertDialog_must){
+		b = alertDialog_must;
+	}
+	
+	public void playSound_must(Context context){
+		v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 		mMediaPlayer = new MediaPlayer();
 		audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -197,8 +214,8 @@ public class SingletonMediaPlayer {
             	if(vib)
     				v.vibrate(1000*60*3);
         	}
-        	final AlertDialog b = alertDialog_must;    
-          //stop playing after certain amount of time   
+
+        	//stop playing after certain amount of time   
 	 		long alarmEndTime = 1000*60*3;   //end after 3 min
 	 		ct = new CountDownTimer(alarmEndTime, 1000) {
 	 			int i = 0;
@@ -220,7 +237,8 @@ public class SingletonMediaPlayer {
 	 		    		 mMediaPlayer.release();
 	 		    		 mMediaPlayer = null;
 	 		    		 v.cancel();
-	 		    		 b.dismiss();
+	 		    		 if(b != null)
+	 		    			 b.dismiss();
 	 		    	 }
 	 		     }
 	 		}.start();	

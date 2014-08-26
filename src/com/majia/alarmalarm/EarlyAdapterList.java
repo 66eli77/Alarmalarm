@@ -29,6 +29,7 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
         this.context = context;
         mySetting = new MySettings(context);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mCurrentlyCheckedRB = new RadioButton(context);
     }
     
     private class ViewHolderEarly {
@@ -58,11 +59,11 @@ public class EarlyAdapterList extends ArrayAdapter<DataList> {
         //Toast.makeText(context, "in" , Toast.LENGTH_SHORT).show();
         if(sharedPreferences.getBoolean("local_boolean_early", false)){
         	holder.radioBtn.setChecked(false);
-        	mCurrentlyCheckedRB = holder.radioBtn;
+    //    	mCurrentlyCheckedRB = holder.radioBtn;
         }else{
         	if(song == selectedSong){
         		holder.radioBtn.setChecked(true);
-        		mCurrentlyCheckedRB = holder.radioBtn;
+        		mCurrentlyCheckedRB = holder.radioBtn; 
         	}else{
         		holder.radioBtn.setChecked(false);
         	}

@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,8 +14,11 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.app.FragmentManager;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
@@ -49,6 +53,43 @@ OnSharedPreferenceChangeListener{
 	private NotificationManager notificationManager;
 	private Notification notification;
 	private static final int NOTIFICATION_EX = 1;
+	
+	/**
+     * The number of pages (wizard steps) to show in this demo.
+     */
+    private static final int NUM_PAGES = 8;
+
+    /**
+     * The pager widget, which handles animation and allows swiping horizontally to access previous
+     * and next wizard steps.
+     */
+    private ViewPager mPager;
+
+    /**
+     * The pager adapter, which provides the pages to the view pager widget.
+     */
+    private PagerAdapter mPagerAdapter;
+    
+    /**
+     * A simple pager adapter that represents 5 {@link ScreenSlidePageFragment} objects, in
+     * sequence.
+     */
+    private class SlideImageAdapter extends FragmentStatePagerAdapter {
+        public SlideImageAdapter(android.support.v4.app.FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public android.support.v4.app.Fragment getItem(int position) {
+        	//mySetting.savePreferences("PageNumber", position);
+            return SlideImageFragment.create(position);
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_PAGES;
+        }
+    }
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -106,29 +147,60 @@ OnSharedPreferenceChangeListener{
 				Must_Wakeup_Alarm.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		TV_must.setText(span_M);	
 		
+		// Instantiate a ViewPager and a PagerAdapter.
+		mPager = (ViewPager) findViewById(R.id.pager);
+		mPagerAdapter = new SlideImageAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(sharedPreferences.getInt("PageNumber", 0));
+        mPager.setPageTransformer(true, new ZoomOutPageTransformer());
+        
+        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                // When changing pages, reset the action bar actions since they are dependent
+                // on which page is currently active. An alternative approach is to have each
+                // fragment expose actions itself (rather than the activity exposing actions),
+                // but for simplicity, the activity provides the actions in this sample.
+    			int n = mPager.getCurrentItem();
+    			mySetting.savePreferences("PageNumber", n);
+            }
+        });
 	}
 	
+	float x0;
+	float y0;
+	float x1;
+	float y1;
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		switch (event.getAction()) {
-			
 		case MotionEvent.ACTION_DOWN:
-			if(v.equals(TV_earliest)){
-				switchState = 1;
-				hourMinutePicker_earliest.show(getFragmentManager(), "timePicker_early");
-				break;
-			}
-			if(v.equals(TV_interval)){
-				switchState = 2;
-				myNumPicker = new NumPicker();
-				FragmentManager fm = getSupportFragmentManager();
-				myNumPicker.show(fm, "numberPicker");
-				break;
-			}
-			if(v.equals(TV_must)){
-				switchState = 3;
-				hourMinutePicker_must.show(getFragmentManager(), "timePicker_must");
-				break;
+			x0 = event.getX();
+			y0 = event.getY();
+			break;
+			
+		case MotionEvent.ACTION_UP:
+			x1 = event.getX();
+			y1 = event.getY();
+			
+			if(Math.abs(x0 - x1) < 20 && Math.abs(y0 - y1) < 20){
+				if(v.equals(TV_earliest)){
+					switchState = 1;
+					hourMinutePicker_earliest.show(getFragmentManager(), "timePicker_early");
+					break;
+				}
+				if(v.equals(TV_interval)){
+					switchState = 2;
+					myNumPicker = new NumPicker();
+					FragmentManager fm = getFragmentManager();
+					myNumPicker.show(fm, "numberPicker");
+					break;
+				}
+				if(v.equals(TV_must)){
+					switchState = 3;
+					hourMinutePicker_must.show(getFragmentManager(), "timePicker_must");
+					break;
+				}
 			}
 		}
 		return true;
